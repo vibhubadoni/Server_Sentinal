@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: serversentinel-api
+  namespace: serversentinel
+  labels:
+    app: serversentinel
+    component: api
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  - port: 9090
+    targetPort: 9090
+    protocol: TCP
+    name: metrics
+  selector:
+    app: serversentinel
+    component: api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: serversentinel-client
+  namespace: serversentinel
+  labels:
+    app: serversentinel
+    component: client
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: serversentinel
+    component: client

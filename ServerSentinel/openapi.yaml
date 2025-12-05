@@ -1,0 +1,336 @@
+openapi: 3.0.3
+info:
+  title: ServerSentinel API
+  description: Real-Time Server Monitoring & Push Notification Alerts API
+  version: 1.0.0
+  contact:
+    name: ServerSentinel Team
+    email: support@serversentinel.io
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://api.serversentinel.example.com/api
+    description: Production server
+
+tags:
+  - name: Auth
+    description: Authentication endpoints
+  - name: Clients
+    description: Monitored client management
+  - name: Metrics
+    description: Metrics ingestion and querying
+  - name: Alerts
+    description: Alert management
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ClientToken:
+      type: apiKey
+      in: header
+      name: x-client-token
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [superadmin, admin, operator, viewer]
+        firstName:
+          type: string
+        lastName:
+          type: string
+
+    Client:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        hostname:
+          type: string
+        ipAddress:
+          type: string
+        osType:
+          type: string
+        osVersion:
+          type: string
+        isActive:
+          type: boolean
+        lastSeen:
+          type: string
+          format: date-time
+
+    Metric:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+          format: uuid
+        metricTime:
+          type: string
+          format: date-time
+        cpuPercent:
+          type: number
+        memoryPercent:
+          type: number
+        diskPercent:
+          type: number
+
+    Alert:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        clientId:
+          type: string
+          format: uuid
+        metric:
+          type: string
+        value:
+          type: number
+        threshold:
+          type: number
+        severity:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, CRITICAL]
+        status:
+          type: string
+          enum: [OPEN, ACKNOWLEDGED, CLOSED]
+        title:
+          type: string
+        message:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      accessToken:
+                        type: string
+                      refreshToken:
+                        type: string
+                      user:
+                        $ref: '#/components/schemas/User'
+
+  /clients:
+    get:
+      tags: [Clients]
+      summary: Get all clients
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of clients
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Client'
+
+    post:
+      tags: [Clients]
+      summary: Register new client
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                hostname:
+                  type: string
+                osType:
+                  type: string
+      responses:
+        '201':
+          description: Client created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      client:
+                        $ref: '#/components/schemas/Client'
+                      token:
+                        type: string
+
+  /metrics/ingest:
+    post:
+      tags: [Metrics]
+      summary: Ingest metrics from agent
+      security:
+        - ClientToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [clientId, timestamp, metrics]
+              properties:
+                clientId:
+                  type: string
+                  format: uuid
+                timestamp:
+                  type: string
+                  format: date-time
+                metrics:
+                  type: object
+                  properties:
+                    cpu:
+                      type: number
+                    memory:
+                      type: number
+                    disk:
+                      type: number
+      responses:
+        '201':
+          description: Metric ingested
+
+  /alerts:
+    get:
+      tags: [Alerts]
+      summary: Query alerts
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [OPEN, ACKNOWLEDGED, CLOSED]
+        - name: severity
+          in: query
+          schema:
+            type: string
+            enum: [LOW, MEDIUM, HIGH, CRITICAL]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: List of alerts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Alert'
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+                      total:
+                        type: integer
+                      totalPages:
+                        type: integer
+
+  /alerts/{id}/acknowledge:
+    post:
+      tags: [Alerts]
+      summary: Acknowledge alert
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Alert acknowledged

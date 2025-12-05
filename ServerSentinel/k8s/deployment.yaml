@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serversentinel-api
+  namespace: serversentinel
+  labels:
+    app: serversentinel
+    component: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: serversentinel
+      component: api
+  template:
+    metadata:
+      labels:
+        app: serversentinel
+        component: api
+    spec:
+      containers:
+      - name: api
+        image: ghcr.io/yourorg/serversentinel-server:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: http
+        - containerPort: 9090
+          name: metrics
+        envFrom:
+        - configMapRef:
+            name: serversentinel-config
+        - secretRef:
+            name: serversentinel-secrets
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serversentinel-client
+  namespace: serversentinel
+  labels:
+    app: serversentinel
+    component: client
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: serversentinel
+      component: client
+  template:
+    metadata:
+      labels:
+        app: serversentinel
+        component: client
+    spec:
+      containers:
+      - name: client
+        image: ghcr.io/yourorg/serversentinel-client:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: http
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5

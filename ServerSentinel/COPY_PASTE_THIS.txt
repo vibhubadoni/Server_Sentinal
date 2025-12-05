@@ -1,0 +1,56 @@
+========================================
+  COPY AND PASTE THESE COMMANDS
+========================================
+
+YOU ARE IN WRONG DIRECTORY!
+You need to go INTO ServerSentinel folder first!
+
+========================================
+STEP 1: Install Backend
+========================================
+
+cd D:\PBL_DBMS\ServerSentinel\server
+npm install
+
+(Wait 2-3 minutes for this to finish)
+
+========================================
+STEP 2: Install Frontend (New Terminal)
+========================================
+
+cd D:\PBL_DBMS\ServerSentinel\client
+npm install
+
+(Wait 3-5 minutes for this to finish)
+
+========================================
+STEP 3: Start Backend
+========================================
+
+cd D:\PBL_DBMS\ServerSentinel\server
+npm run dev
+
+(Keep this terminal open)
+
+========================================
+STEP 4: Start Frontend (New Terminal)
+========================================
+
+cd D:\PBL_DBMS\ServerSentinel\client
+npm run dev
+
+(Keep this terminal open)
+
+========================================
+STEP 5: Open Browser
+========================================
+
+http://localhost:5173
+
+Login:
+Email: admin@serversentinel.io
+Password: password123
+
+========================================
+DONE!
+========================================

@@ -1,0 +1,36 @@
+========================================
+  ⚠️ YOU ARE IN WRONG DIRECTORY!
+========================================
+
+You are here:
+  D:\PBL_DBMS>  ❌ WRONG!
+
+You need to be here:
+  D:\PBL_DBMS\ServerSentinel\server>  ✅ CORRECT!
+
+========================================
+  COPY AND PASTE THIS:
+========================================
+
+cd D:\PBL_DBMS\ServerSentinel\server
+npm run dev
+
+========================================
+  Then in NEW terminal:
+========================================
+
+cd D:\PBL_DBMS\ServerSentinel\client
+npm run dev
+
+========================================
+  REMEMBER:
+========================================
+
+There is NO package.json in D:\PBL_DBMS
+You must go INTO the ServerSentinel folder!
+
+Always use full path:
+  cd D:\PBL_DBMS\ServerSentinel\server
+  cd D:\PBL_DBMS\ServerSentinel\client
+
+========================================

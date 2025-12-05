@@ -1,0 +1,39 @@
+========================================
+  ✅ ALL FIXED! RUN THIS NOW:
+========================================
+
+In your terminal (you're already in server folder):
+
+npm run dev
+
+That's it!
+
+========================================
+  Expected Output:
+========================================
+
+✅ In-memory database initialized
+🚀 ServerSentinel API started
+📊 API available at http://0.0.0.0:3000
+
+NO MORE ERRORS!
+
+========================================
+  Then Start Frontend:
+========================================
+
+Open NEW terminal:
+
+cd D:\PBL_DBMS\ServerSentinel\client
+npm run dev
+
+========================================
+  Then Open Browser:
+========================================
+
+http://localhost:5173
+
+Login: admin@serversentinel.io
+Password: password123
+
+DONE! 🎉

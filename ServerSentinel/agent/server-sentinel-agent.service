@@ -1,0 +1,28 @@
+[Unit]
+Description=ServerSentinel Monitoring Agent
+Documentation=https://github.com/yourorg/serversentinel
+After=network.target
+
+[Service]
+Type=simple
+User=sentinel
+Group=sentinel
+WorkingDirectory=/opt/serversentinel-agent
+Environment="NODE_ENV=production"
+EnvironmentFile=/opt/serversentinel-agent/.env
+ExecStart=/usr/bin/node /opt/serversentinel-agent/dist/index.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=serversentinel-agent
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/serversentinel-agent
+
+[Install]
+WantedBy=multi-user.target
